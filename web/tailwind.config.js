@@ -7,6 +7,9 @@ module.exports = {
         primary: 'var(--primary)',
         secondary: 'var(--secondary)'
       },
+      borderColor: {
+        primary: 'var(--primary)'
+      },
       fontFamily: {
         sans: 'var(--default-font)'
       }

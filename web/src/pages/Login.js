@@ -1,15 +1,81 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Button from '../Components/Button'
 import logo from '../logo.svg'
+
+import { RecaptchaVerifier } from 'firebase/auth'
+import { useAuth } from '../Context/AuthContext'
+import { auth } from '../firebase'
 function Login () {
   const [formData, setFormData] = useState({
     name: '',
-    phno: ''
+    phno: '',
+    otp: ''
   })
+  const [error, setError] = useState({
+    phno: {
+      error: false,
+      message: ''
+    },
+    otp: {
+      error: false,
+      message: ''
+    }
+  })
+  const authState = useAuth()
+  const navigate = useNavigate()
+  const [otpSent, setOtpSent] = useState(false)
+  const [confirmationResult, setConfirmationResult] = useState(null)
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState(null)
+
+  useEffect(() => {
+    if (authState.currentUser) navigate('/')
+    setRecaptchaVerifier(
+      new RecaptchaVerifier(
+        'sign-in-button',
+        {
+          size: 'invisible',
+          callback: () => {
+            console.log('Captcha Verified')
+          }
+        },
+        auth
+      )
+    )
+  }, [])
+
+  const callback = useCallback(
+    (confirmationRes) => {
+      setOtpSent(true)
+      setConfirmationResult(confirmationRes)
+    },
+    [setOtpSent, setConfirmationResult]
+  )
 
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log(formData)
+    if (otpSent) {
+      if (confirmationResult) {
+        confirmationResult
+          .confirm(formData.otp)
+          .then(() => navigate('/'))
+          .catch((err) => {
+            if (err.code === 'auth/invalid-verification-code') {
+              // alert(err.code)
+              setError((error) => ({
+                ...error,
+                otp: {
+                  error: true,
+                  message: 'Wrong OTP'
+                }
+              }))
+            }
+          })
+      }
+    } else {
+      authState.signIn(recaptchaVerifier, formData.phno, callback)
+    }
   }
 
   return (
@@ -30,15 +96,6 @@ function Login () {
         </p>
         <form className=' mt-5 flex flex-col'>
           <input
-            value={formData.name}
-            onChange={(e) => {
-              setFormData({ ...formData, name: e.target.value })
-            }}
-            type='text'
-            placeholder='Name'
-            className='p-5 rounded-md bg-secondary my-3'
-          />
-          <input
             value={formData.phno}
             onChange={(e) => {
               setFormData({ ...formData, phno: e.target.value })
@@ -47,12 +104,32 @@ function Login () {
             placeholder='Phone Number'
             className='p-5 rounded-md bg-secondary my-3'
           />
+          {otpSent && (
+            <>
+              <input
+                value={formData.otp}
+                onChange={(e) => {
+                  setFormData({ ...formData, otp: e.target.value })
+                }}
+                type='text'
+                placeholder='OTP'
+                className={`p-5 rounded-md bg-secondary my-3 ${
+                  error.otp.error ?? 'border-red-500'
+                }`}
+              />
+              {error.otp.error && (
+                <p className=' text-sm text-red-500'>{error.otp.message}</p>
+              )}
+            </>
+          )}
           <Button
+            disabled={false}
+            id='sign-in-button'
             onClick={handleSubmit}
             type='submit'
             className='mx-0 w-full'
           >
-            Log In
+            {!otpSent ? 'Send OTP' : 'Verify'}
           </Button>
         </form>
       </div>
