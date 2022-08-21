@@ -1,29 +1,46 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { auth } from '../firebase'
-import { signInWithPhoneNumber } from 'firebase/auth'
-const AuthContext = createContext()
+import { createContext, useContext, useEffect, useState } from "react";
+import { auth } from "../firebase";
 
-export function useAuth () {
-  return useContext(AuthContext)
+import {
+  onAuthStateChanged,
+  signInWithPhoneNumber,
+  signOut,
+} from "firebase/auth";
+const AuthContext = createContext();
+
+export function useAuth() {
+  return useContext(AuthContext);
 }
 
-export function AuthProvider ({ children }) {
-  const [currentUser, setCurrentUser] = useState()
+export function AuthProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const value = {
     currentUser,
-    signIn
-  }
+    signIn,
+    signOut: logOut,
+    loading,
+  };
 
-  function signIn (recaptchaVerifier, phno, callback) {
-    return signInWithPhoneNumber(auth, phno, recaptchaVerifier).then(callback)
+  function signIn(recaptchaVerifier, phno) {
+    return signInWithPhoneNumber(auth, phno, recaptchaVerifier);
+  }
+  function logOut() {
+    return signOut(auth);
   }
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setCurrentUser(user)
-    })
-    return unsubscribe()
-  })
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("state changed");
+      setCurrentUser(user);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 }
