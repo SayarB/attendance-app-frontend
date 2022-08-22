@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../Components/Button";
 import { useAuth } from "../Context/AuthContext";
-
+import axios from "axios";
 const dateString = new Date().toLocaleString("en-GB", {
   day: "numeric",
   month: "long",
@@ -15,12 +15,22 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const retrieveIdToken = async () => {
+    const getUserFromBackend = async () => {
       const idToken = await getIdToken(authState.currentUser);
       console.log(idToken);
+      const res = await axios.post(
+        `https://attendencegdsc.herokuapp.com/get_user`,
+        {
+          club_name: "tests",
+          token: idToken,
+        }
+      );
+      console.log(res.data);
     };
     if (authState.currentUser === null) navigate("/welcome");
-    else retrieveIdToken();
+    else {
+      getUserFromBackend();
+    }
   }, []);
 
   const handleSignOut = async () => {
