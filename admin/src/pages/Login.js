@@ -3,15 +3,18 @@ import { useNavigate } from "react-router-dom";
 import Button from "../Components/Button";
 import logo from "../logo.svg";
 import axios from "axios";
-import { getIdToken, RecaptchaVerifier } from "firebase/auth";
+import { getIdToken, RecaptchaVerifier, signOut } from "firebase/auth";
 import { useAuth } from "../Context/AuthContext";
 import { auth } from "../firebase";
+
+const initialFormData = {
+  name: "",
+  phno: "",
+  otp: "",
+};
+
 function Login() {
-  const [formData, setFormData] = useState({
-    name: "",
-    phno: "",
-    otp: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
   const [error, setError] = useState({
     phno: {
       error: false,
@@ -67,10 +70,14 @@ function Login() {
 
               const data = res.data;
               console.log(data);
+              if (res.data.is_admin === 0) {
+                alert("You are not an admin");
+                authState.signOut().then(() => setFormData(initialFormData));
+              }
             } catch (err) {
               console.log(err);
             } finally {
-              navigate("/");
+              if (authState.currentUser) navigate("/");
             }
           })
           .catch((err) => {

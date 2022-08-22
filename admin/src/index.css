@@ -1,3 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.root,
+#root,
+#docs-root {
+  --primary: #3d73dd;
+  --secondary: #f5f5f5;
+  --default-font: "Product Sans", sans-serif;
+}
+
 body {
   margin: 0;
   font-family:

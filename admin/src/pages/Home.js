@@ -15,7 +15,8 @@ function Home() {
   const navigate = useNavigate();
   const [attendanceOpen, setAttendanceOpen] = useState();
   useEffect(() => {
-    if (authState.currentUser === null) return navigate("/login");
+    if (authState.currentUser === null) navigate("/login");
+
     axios
       .get("https://attendencegdsc.herokuapp.com/attendence_state/tests")
       .then((res) => {
@@ -55,7 +56,7 @@ function Home() {
         <p className=" font-sans text-primary text-xl">{dateString}</p>
       </div>
       <div className="flex-1 flex items-center justify-center">
-        <Button disabled={!attendanceOpen}>Check In</Button>
+        <Button disabled={!attendanceOpen}>Open </Button>
       </div>
     </div>
   );
