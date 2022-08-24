@@ -9,6 +9,7 @@ import { getIdToken } from "firebase/auth";
 import { toast } from "react-toastify";
 import Lottie from "react-lottie";
 import animationData from "../assets/loading";
+import Card from "../Components/Card";
 const dateString = new Date().toLocaleString("en-GB", {
   day: "numeric",
   month: "long",
@@ -122,6 +123,18 @@ function Home() {
         </div>
         <div className=" w-full border-y-2 py-3 text-center">
           <p className=" font-sans text-primary text-xl">{dateString}</p>
+        </div>
+        <div className="flex-1 flex flex-col">
+          <Card
+            text={"Today 57 members have given attendence"}
+            img="avatar2.svg"
+            icon="tick.svg"
+          />
+          <Card
+            text={"See who were present"}
+            img="avatar3.svg"
+            icon="download.svg"
+          />
         </div>
         <div className="flex-1 flex items-center justify-center">
           <Button onClick={handleClick} disabled={!attendanceOpen}>
