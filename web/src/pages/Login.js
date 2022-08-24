@@ -36,7 +36,7 @@ function Login() {
   const [recaptchaVerifier, setRecaptchaVerifier] = useState(null);
 
   useEffect(() => {
-    if (authState.currentUser !== null) navigate("/");
+    if (authState.currentUser !== null) navigate("/", { replace: true });
   }, []);
 
   useEffect(() => {
@@ -80,7 +80,7 @@ function Login() {
                   authState.signOut();
                 } else {
                   setLoading(false);
-                  navigate("/");
+                  navigate("/", { replace: true });
                 }
               } catch (err) {
                 authState.signOut().then(() => {

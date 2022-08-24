@@ -68,18 +68,26 @@ function Home() {
     console.log("Open attendence");
     // console.log(new Date().toUTCString());
     setLoading(true);
-    const res = await axios.post(
-      "https://attendencegdsc.herokuapp.com/give_attendence/",
-      {
-        club_name: "tests",
-        token,
-        lat: position.lat,
-        long: position.long,
-        utc: new Date().toUTCString(),
-      }
-    );
-    setLoading(false);
-    console.log("res = ", res.data);
+    try {
+      const res = await axios.post(
+        "https://attendencegdsc.herokuapp.com/give_attendence/",
+        {
+          club_name: "tests",
+          token,
+          lat: position.lat,
+          long: position.long,
+          utc: new Date().toUTCString(),
+        }
+      );
+
+      setLoading(false);
+      console.log("res = ", res.data);
+      if (res.data.error && res.data.error === "user not in range") {
+        navigate("/failure");
+      } else navigate("/success");
+    } catch (err) {
+      toast.error("There was some Problem");
+    }
   };
 
   const lottieOptions = {
@@ -94,7 +102,7 @@ function Home() {
   return (
     <>
       {isLoading && (
-        <div className="relative w-[100vw] h-[100vh] bg-white z-10">
+        <div className="fixed w-[100vw] h-[100vh] bg-white z-10">
           <div className=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
             <Lottie options={lottieOptions} height={400} width={400} />
           </div>
