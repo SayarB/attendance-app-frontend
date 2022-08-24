@@ -77,7 +77,7 @@ function Home() {
     const res = await axios.post(
       "https://attendencegdsc.herokuapp.com/take_attendence/",
       {
-        club_name: "tests",
+        club_name: "testing",
         token,
         lat: position.lat,
         long: position.long,

@@ -68,7 +68,7 @@ function Login() {
                 const res = await axios.post(
                   "https://attendencegdsc.herokuapp.com/get_user/",
                   {
-                    club_name: "tests",
+                    club_name: "testing",
                     token: idToken,
                   }
                 );
