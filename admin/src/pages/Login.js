@@ -7,6 +7,8 @@ import { getIdToken, RecaptchaVerifier } from "firebase/auth";
 import { useAuth } from "../Context/AuthContext";
 import { auth } from "../firebase";
 import { toast } from "react-toastify";
+import Lottie from "react-lottie";
+import animationData from "../assets/loading";
 const initialFormData = {
   name: "",
   phno: "",
@@ -134,13 +136,21 @@ function Login() {
         });
     }
   };
+  const lottieOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
 
   return (
     <>
       {isLoading && (
         <div className="relative w-[100vw] h-[100vh] bg-white z-10">
           <div className=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
-            <img src="loading.gif" alt="" />
+            <Lottie options={lottieOptions} height={400} width={400} />
           </div>
         </div>
       )}

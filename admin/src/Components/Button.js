@@ -3,7 +3,6 @@ import React from 'react'
 function Button ({ id, onClick, children, className, type, disabled }) {
   return (
     <button
-      disabled={disabled}
       id={id}
       type={type}
       onClick={onClick}
