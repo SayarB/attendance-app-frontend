@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import Lottie from "react-lottie";
 import animationData from "../assets/loading";
 import Card from "../Components/Card";
+import { Link } from "react-router-dom";
 const dateString = new Date().toLocaleString("en-GB", {
   day: "numeric",
   month: "long",
@@ -27,13 +28,14 @@ function Home() {
   });
   useEffect(() => {
     setLoading(true);
-
-    navigator.geolocation.getCurrentPosition((pos) => {
-      console.log(
-        "lat = " + pos.coords.latitude + "\nlong = " + pos.coords.longitude
-      );
-      setPosition({ lat: pos.coords.latitude, long: pos.coords.longitude });
-    });
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        console.log(
+          "lat = " + pos.coords.latitude + "\nlong = " + pos.coords.longitude
+        );
+        setPosition({ lat: pos.coords.latitude, long: pos.coords.longitude });
+      });
+    }
 
     const retrieveIdToken = async () => {
       const idToken = await getIdToken(authState.currentUser, true);
@@ -125,11 +127,13 @@ function Home() {
           <p className=" font-sans text-primary text-xl">{dateString}</p>
         </div>
         <div className="flex-1 flex flex-col">
-          <Card
-            text={"Today 57 members have given attendence"}
-            img="avatar2.svg"
-            icon="tick.svg"
-          />
+          <Link to={"/list"}>
+            <Card
+              text={"Today 57 members have given attendence"}
+              img="avatar2.svg"
+              icon="tick.svg"
+            />
+          </Link>
           <Card
             text={"See who were present"}
             img="avatar3.svg"
