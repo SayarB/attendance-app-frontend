@@ -86,6 +86,7 @@ function Home() {
         navigate("/failure");
       } else navigate("/success");
     } catch (err) {
+      setLoading(false);
       toast.error("There was some Problem");
     }
   };
