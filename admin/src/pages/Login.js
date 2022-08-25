@@ -43,15 +43,42 @@ function Login() {
   }, []);
 
   const handleClick = async () => {
+    setLoading(true);
     authState
       .signIn()
-      .then((result) => {
-        console.log("user = ", result.user);
-
-        navigate("/");
+      .then(async (result) => {
+        try {
+          const idToken = await getIdToken(result.user, true);
+          const res = await axios.post(
+            "https://attendencegdsc.herokuapp.com/get_user/",
+            {
+              club_name: "testing",
+              token: idToken,
+            }
+          );
+          const data = res.data;
+          console.log(data);
+          if (res.data.is_admin === 0) {
+            authState.signOut().then(() => {
+              setLoading(false);
+            });
+            toast.error("You are not an Admin");
+          } else {
+            setLoading(false);
+            navigate("/", { replace: true });
+          }
+        } catch (err) {
+          authState.signOut().then(() => {
+            setLoading(false);
+          });
+          toast.error("There was some error");
+        }
       })
       .catch((err) => {
-        console.log("error = ", err.message);
+        authState.signOut(() => {
+          setLoading(false);
+          toast.error(err.code);
+        });
       });
   };
 

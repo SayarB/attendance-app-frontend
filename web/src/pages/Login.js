@@ -27,8 +27,6 @@ const initialError = {
 };
 
 function Login() {
-  const [formData, setFormData] = useState(initialFormData);
-  const [error, setError] = useState(initialError);
   const authState = useAuth();
   const navigate = useNavigate();
 
@@ -42,11 +40,33 @@ function Login() {
     setLoading(true);
     authState
       .signIn()
-      .then((result) => {
+      .then(async (result) => {
         setLoading(false);
-        console.log("user = ", result.user);
-
-        navigate("/");
+        try {
+          const idToken = await getIdToken(result.user, true);
+          const res = await axios.post(
+            "https://attendencegdsc.herokuapp.com/get_user/",
+            {
+              club_name: "testing",
+              token: idToken,
+            }
+          );
+          const data = res.data;
+          console.log(data);
+          if (res.status === 404) {
+            toast.error("User Not Found");
+            setLoading(false);
+            authState.signOut();
+          } else {
+            setLoading(false);
+            navigate("/", { replace: true });
+          }
+        } catch (err) {
+          authState.signOut().then(() => {
+            setLoading(false);
+          });
+          toast.error("There was some error");
+        }
       })
       .catch((err) => {
         setLoading(false);
