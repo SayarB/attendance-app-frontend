@@ -71,7 +71,7 @@ function Login() {
           authState.signOut().then(() => {
             setLoading(false);
           });
-          toast.error("There was some error");
+          toast.error("There was some problem");
         }
       })
       .catch((err) => {
