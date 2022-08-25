@@ -105,7 +105,12 @@ function Home() {
       {isLoading && (
         <div className="fixed w-[100vw] h-[100vh] bg-white z-10">
           <div className=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
-            <Lottie options={lottieOptions} height={400} width={400} />
+            <Lottie
+              isClickToPauseDisabled
+              options={lottieOptions}
+              height={400}
+              width={400}
+            />
           </div>
         </div>
       )}

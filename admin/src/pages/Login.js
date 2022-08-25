@@ -9,6 +9,8 @@ import { auth } from "../firebase";
 import { toast } from "react-toastify";
 import Lottie from "react-lottie";
 import animationData from "../assets/loading";
+import { getRedirectResult } from "firebase/auth";
+import googleLogo from "../assets/google-logo.svg";
 const initialFormData = {
   name: "",
   phno: "",
@@ -29,113 +31,30 @@ function Login() {
   });
   const authState = useAuth();
   const navigate = useNavigate();
-  const [otpSent, setOtpSent] = useState(false);
-  const [confirmationResult, setConfirmationResult] = useState(null);
   const [isLoading, setLoading] = useState(false);
-  const [recaptchaVerifier, setRecaptchaVerifier] = useState(null);
 
   useEffect(() => {
-    if (authState.currentUser !== null) navigate("/");
+    if (authState.currentUser !== null) navigate("/", { replace: true });
+    // else {
+    //   authState.getResult().then((result) => {
+    //     console.log(result.user);
+    //   });
+    // }
   }, []);
 
-  useEffect(() => {
-    setRecaptchaVerifier(
-      new RecaptchaVerifier(
-        "sign-in-button",
-        {
-          size: "invisible",
-          callback: () => {
-            console.log("Captcha Verified");
-          },
-        },
-        auth
-      )
-    );
-  }, []);
+  const handleClick = async () => {
+    authState
+      .signIn()
+      .then((result) => {
+        console.log("user = ", result.user);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log(formData);
-    if (otpSent) {
-      if (confirmationResult) {
-        setLoading(true);
-        confirmationResult
-          .confirm(formData.otp)
-          .then(async (result) => {
-            try {
-              const idToken = await getIdToken(result.user, true);
-              try {
-                const res = await axios.post(
-                  "https://attendencegdsc.herokuapp.com/get_user/",
-                  {
-                    club_name: "testing",
-                    token: idToken,
-                  }
-                );
-
-                const data = res.data;
-                console.log(data);
-                if (res.data.is_admin === 0) {
-                  authState.signOut().then(() => {
-                    setFormData(initialFormData);
-                    setOtpSent(false);
-                    setLoading(false);
-                    setConfirmationResult(null);
-                  });
-                  toast.error("You are not an Admin");
-                } else navigate("/");
-              } catch (err) {
-                authState.signOut().then(() => {
-                  setFormData(initialFormData);
-                  setOtpSent(false);
-                  setLoading(false);
-                  setConfirmationResult(null);
-                });
-                toast.error("There was some error");
-              }
-            } catch (err) {
-              setLoading(false);
-              authState.signOut();
-              console.log(err);
-            }
-          })
-          .catch((err) => {
-            setLoading(false);
-            if (err.code === "auth/invalid-verification-code") {
-              // alert(err.code)
-              setError((error) => ({
-                ...error,
-                otp: {
-                  error: true,
-                  message: "Wrong OTP",
-                },
-              }));
-            }
-          });
-      }
-    } else {
-      setLoading(true);
-      authState
-        .signIn(recaptchaVerifier, formData.phno)
-        .then((confirmationRes) => {
-          setLoading(false);
-          setOtpSent(true);
-          setConfirmationResult(confirmationRes);
-        })
-        .catch((err) => {
-          setLoading(false);
-          if (err.code === "auth/invalid-phone-number") {
-            setError((error) => ({
-              ...error,
-              phno: {
-                error: true,
-                message: "Invalid Phone Number",
-              },
-            }));
-          }
-        });
-    }
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log("error = ", err.message);
+      });
   };
+
   const lottieOptions = {
     loop: true,
     autoplay: true,
@@ -150,7 +69,12 @@ function Login() {
       {isLoading && (
         <div className="relative w-[100vw] h-[100vh] bg-white z-10">
           <div className=" absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
-            <Lottie options={lottieOptions} height={400} width={400} />
+            <Lottie
+              isClickToPauseDisabled
+              options={lottieOptions}
+              height={400}
+              width={400}
+            />
           </div>
         </div>
       )}
@@ -170,47 +94,17 @@ function Login() {
               club seniors about <span className=" font-bold">Nock</span> access
             </span>
           </p>
-          <form className=" mt-5 flex flex-col">
-            <input
-              value={formData.phno}
-              onChange={(e) => {
-                setFormData({ ...formData, phno: e.target.value });
-              }}
-              type="text"
-              placeholder="Phone Number"
-              className="p-5 rounded-md bg-secondary my-3"
-            />
-            {error.phno.error && (
-              <p className=" text-sm text-red-500">{error.phno.message}</p>
-            )}
-            {otpSent && (
-              <>
-                <input
-                  value={formData.otp}
-                  onChange={(e) => {
-                    setFormData({ ...formData, otp: e.target.value });
-                  }}
-                  type="text"
-                  placeholder="OTP"
-                  className={`p-5 rounded-md bg-secondary my-3 ${
-                    error.otp.error ?? "border-red-500"
-                  }`}
-                />
-                {error.otp.error && (
-                  <p className=" text-sm text-red-500">{error.otp.message}</p>
-                )}
-              </>
-            )}
-            <Button
-              disabled={false}
-              id="sign-in-button"
-              onClick={handleSubmit}
-              type="submit"
-              className="mx-0 w-full"
-            >
-              {!otpSent ? "Send OTP" : "Verify"}
-            </Button>
-          </form>
+
+          <Button
+            disabled={false}
+            id="sign-in-button"
+            onClick={handleClick}
+            type="submit"
+            className="mx-0 w-full flex items-center justify-center"
+          >
+            <img src={googleLogo} alt="" className="mx-5 w-10" /> Sign In with
+            Google
+          </Button>
         </div>
       </div>
     </>

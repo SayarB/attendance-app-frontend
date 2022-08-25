@@ -63,7 +63,7 @@ function List() {
         {members.length > 0 ? (
           <ul>
             {members.map((member) => (
-              <li>{member.name}</li>
+              <li key={"member-" + member.name}>{member.name}</li>
             ))}
           </ul>
         ) : (
