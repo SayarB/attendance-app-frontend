@@ -49,7 +49,7 @@ function Home() {
     }
 
     axios
-      .get("https://attendencegdsc.herokuapp.com/attendence_state/tests")
+      .get("https://attendencegdsc.herokuapp.com/attendence_state/testing")
       .then((res) => {
         console.log(res.data);
         setAttendanceOpen(res.data.state);
