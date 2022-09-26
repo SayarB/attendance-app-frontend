@@ -86,6 +86,7 @@ function Login() {
     loop: true,
     autoplay: true,
     animationData: animationData,
+    isClickToPauseDisabled: true,
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
     },
