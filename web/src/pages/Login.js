@@ -54,7 +54,7 @@ function Login () {
       })
       .catch((err) => {
         setLoading(false)
-        toast.error(err.code)
+        toast.error(err.message)
       })
   }
   const lottieOptions = {
