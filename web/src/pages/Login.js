@@ -49,7 +49,8 @@ function Login () {
             setLoading(false)
           })
           console.log('Error: ', err)
-          if (err.request.status === 404) toast.error('Could not find user')
+
+          if (err.response.status === 404) toast.error('Could not find user')
         }
       })
       .catch((err) => {
