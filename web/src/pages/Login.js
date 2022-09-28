@@ -53,8 +53,13 @@ function Login () {
         }
       })
       .catch((err) => {
+        console.log(err.name)
         setLoading(false)
-        toast.error(err.message)
+        if (err.code !== 'auth/popup-closed-by-user') {
+          toast.error(err.code)
+        } else {
+          toast.error('The Popup for authentication was closed')
+        }
       })
   }
   const lottieOptions = {
