@@ -8,7 +8,8 @@ import {
   signOut,
   getRedirectResult,
   signInWithPopup,
-  GoogleAuthProvider
+  GoogleAuthProvider,
+  signInWithRedirect
 } from 'firebase/auth'
 const AuthContext = createContext()
 
@@ -29,7 +30,7 @@ export function AuthProvider ({ children }) {
   }
 
   function signIn () {
-    return signInWithPopup(auth, provider)
+    return signInWithRedirect(auth, provider)
   }
   function getResult () {
     return getRedirectResult(auth)
